@@ -1,7 +1,9 @@
-import menuList from './menu.json'
+import menuList from '../menu.json'
 import menuTpl from '../templates/menu-tpl.hbs'
 
 const menuRef = document.querySelector('.js-menu');
+const switchRef = document.querySelector('#theme-switch-toggle');
+const bodyRef = document.querySelector('body');
 
 function createMenuMarkup(items) {
   return menuTpl(items);
@@ -9,27 +11,25 @@ function createMenuMarkup(items) {
 
 menuRef.insertAdjacentHTML('beforeend', createMenuMarkup(menuList));
 
-const switchRef = document.querySelector('#theme-switch__toggle');
+const {LIGHT, DARK} = {
+    LIGHT: 'light-theme',
+    DARK: 'dark-theme',
+  };
 
-const Theme = {
-  LIGHT: 'light-theme',
-  DARK: 'dark-theme',
-};
-
-const bodyRef = document.querySelector('body');
-
-switchRef.addEventListener('change', ChangeTheme);
-
-function ChangeTheme(e) {
-  if (e.target.chacked) {
-    bodyRef.classList.add(DARK);
-    localStorage.setItem('theme', DARK);
-  } else {
-    bodyRef.classList.add(LIGHT);
-    localStorage.setItem('theme', LIGHT);
-  }
-}
-
-let getTheme = localStorage('theme');
+  let getTheme = localStorage.getItem('theme');
 
 bodyRef.classList.add(getTheme ? getTheme : LIGHT);
+switchRef.checked = getTheme === DARK;
+
+
+switchRef.addEventListener('change', changeTheme);
+
+function changeTheme ({target : { checked }}) {
+    checked ? toggleTheme(DARK, LIGHT) : toggleTheme (LIGHT, DARK);
+}
+
+function toggleTheme (add, rem) {
+    bodyRef.classList.replace(rem, add);
+    localStorage.setItem('theme', add);
+}
+
